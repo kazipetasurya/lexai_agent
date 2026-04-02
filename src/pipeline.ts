@@ -6,6 +6,8 @@ import express, { type Request, type Response, type NextFunction } from "express
 import multer from "multer";
 import { createClient } from "@libsql/client";
 import OpenAI from "openai";
+import { wrapOpenAI } from "langsmith/wrappers";
+import { traceable } from "langsmith/traceable";
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
@@ -74,7 +76,7 @@ async function dbListSessions() {
 
 // ── OpenAI + Multer ────────────────────────────────────────────────────────
 
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+const openai = wrapOpenAI(new OpenAI({ apiKey: OPENAI_API_KEY }));
 const r2 = process.env.R2_ACCOUNT_ID ? new S3Client({
   region: "auto",
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -88,7 +90,7 @@ const upload = multer({ storage, limits: { fileSize: 52 * 1024 * 1024 }, fileFil
 
 // ── runTurn ────────────────────────────────────────────────────────────────
 
-export async function runTurn(state: LegalAgentState): Promise<LegalAgentState> {
+export const runTurn = traceable(async function runTurn(state: LegalAgentState): Promise<LegalAgentState> {
   const sessionId = state.sessionId;
   const phase = state.currentPhase;
   let analyzerOutput: Record<string, unknown> = {};
@@ -120,7 +122,7 @@ export async function runTurn(state: LegalAgentState): Promise<LegalAgentState> 
   const now = new Date().toISOString();
   ws = { ...ws, messages: [...ws.messages, { role: "user", content: state.currentUserInput, timestamp: now }, { role: "assistant", content: reply, timestamp: now }], currentAssistantReply: reply, phaseTurnCount: speakerFailed ? Math.max(0, ws.phaseTurnCount - 1) : ws.phaseTurnCount };
   return ws;
-}
+}, { name: "runTurn", tags: ["lexai"] });
 
 // ── Express ────────────────────────────────────────────────────────────────
 
