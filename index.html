@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Litmetrics — Legal Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:            #FAF7F2;
+    --cream-dark:       #F0EAE0;
+    --warm-white:       #FFFDF9;
+    --terracotta:       #C4673A;
+    --terracotta-light: #E07A4E;
+    --terracotta-pale:  #F5E6DC;
+    --charcoal:         #2C2420;
+    --charcoal-mid:     #5C4A3E;
+    --charcoal-soft:    #8A7268;
+    --sage:             #7A9E8E;
+    --border:           rgba(44,36,32,0.1);
+    --shadow:           0 2px 20px rgba(44,36,32,0.07);
+    --shadow-lg:        0 8px 48px rgba(44,36,32,0.14);
+    --radius:           16px;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html { height: 100%; }
+
+  body {
+    height: 100%;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--charcoal);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── APP SHELL ── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 16px 20px;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; }
+
+  .logo-mark {
+    width: 34px; height: 34px;
+    background: var(--terracotta);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; fill: white; }
+
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 500;
+    color: var(--charcoal); letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-size: 10px; font-weight: 300;
+    color: var(--charcoal-soft); letter-spacing: 0.9px;
+    text-transform: uppercase; margin-top: 2px;
+  }
+
+  /* connection status pill */
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+    background: var(--cream-dark);
+    color: var(--charcoal-soft);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .status-pill.connected { background: rgba(122,158,142,0.12); color: var(--sage); border-color: rgba(122,158,142,0.3); }
+  .status-pill.error { background: rgba(196,103,58,0.1); color: var(--terracotta); border-color: rgba(196,103,58,0.25); }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--charcoal-soft);
+    transition: background 0.3s;
+  }
+  .status-pill.connected .status-dot { background: var(--sage); animation: livePulse 2s infinite; }
+  .status-pill.error .status-dot { background: var(--terracotta); }
+
+  /* ── CHAT AREA ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 3px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Welcome */
+  .welcome {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 32px 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .welcome-orb {
+    width: 76px; height: 76px;
+    background: var(--terracotta-pale);
+    border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .welcome-orb::after {
+    content: '';
+    position: absolute; inset: -6px;
+    border-radius: 34px;
+    border: 1px solid rgba(196,103,58,0.15);
+  }
+
+  .welcome-orb svg { width: 36px; height: 36px; stroke: var(--terracotta); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  .welcome h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 500; color: var(--charcoal);
+    margin-bottom: 10px; line-height: 1.25;
+  }
+
+  .welcome p {
+    font-size: 14px; color: var(--charcoal-soft);
+    line-height: 1.7; max-width: 320px; font-weight: 300;
+  }
+
+  .welcome-cta {
+    margin-top: 22px;
+    display: flex; gap: 10px; align-items: center;
+  }
+
+  .cta-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: none; transition: all 0.2s;
+  }
+
+  .cta-chip.voice-cta {
+    background: var(--terracotta); color: white;
+    box-shadow: 0 3px 12px rgba(196,103,58,0.3);
+  }
+  .cta-chip.voice-cta:hover { background: var(--terracotta-light); transform: translateY(-1px); }
+
+  .cta-chip.text-cta {
+    background: var(--warm-white); color: var(--charcoal-mid);
+    border: 1.5px solid var(--border);
+  }
+  .cta-chip.text-cta:hover { border-color: var(--charcoal-mid); }
+
+  .cta-chip svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Messages */
+  .message {
+    display: flex; gap: 9px;
+    animation: fadeUp 0.25s ease both;
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .av {
+    width: 30px; height: 30px; border-radius: 9px;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; margin-top: 2px; font-weight: 500;
+  }
+
+  .av.agent { background: var(--terracotta); color: white; font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; }
+  .av.user  { background: var(--charcoal); color: white; font-size: 11px; }
+
+  .bubble {
+    max-width: calc(100% - 50px);
+    padding: 12px 15px;
+    border-radius: 14px;
+    font-size: 14.5px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .message.agent .bubble {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 3px 14px 14px 14px;
+    color: var(--charcoal);
+    box-shadow: var(--shadow);
+  }
+
+  .message.user .bubble {
+    background: var(--terracotta);
+    color: white;
+    border-radius: 14px 3px 14px 14px;
+  }
+
+  /* Typing */
+  .typing { display: flex; gap: 9px; align-items: flex-end; }
+
+  .typing-dots {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 3px 14px 14px 14px;
+    padding: 13px 16px; display: flex; gap: 5px; align-items: center;
+    box-shadow: var(--shadow);
+  }
+
+  .typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--charcoal-soft);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  .disclaimer-note {
+    margin: 2px 0 0 39px;
+    font-size: 10.5px; color: var(--charcoal-soft);
+    font-style: italic; line-height: 1.5; opacity: 0.65;
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    padding: 14px 18px 18px;
+    background: var(--warm-white);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .input-row { display: flex; gap: 9px; align-items: flex-end; }
+
+  /* Voice toggle — large, central, inviting */
+  .btn-voice-main {
+    width: 48px; height: 48px; border-radius: 14px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; position: relative;
+    -webkit-appearance: none;
+  }
+
+  .btn-voice-main svg { width: 20px; height: 20px; stroke: var(--charcoal-soft); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+  .btn-voice-main:hover { border-color: var(--terracotta); background: var(--terracotta-pale); }
+  .btn-voice-main:hover svg { stroke: var(--terracotta); }
+
+  .btn-voice-main.active {
+    border-color: #E53E3E; background: #FFF5F5;
+  }
+  .btn-voice-main.active svg { stroke: #E53E3E; }
+
+  .rec-ring {
+    position: absolute; inset: -5px; border-radius: 20px;
+    border: 2px solid rgba(229,62,62,0); pointer-events: none;
+    transition: border-color 0.3s;
+  }
+  .btn-voice-main.active .rec-ring {
+    border-color: rgba(229,62,62,0.3);
+    animation: ringPulse 1.5s infinite;
+  }
+
+  textarea {
+    flex: 1;
+    padding: 13px 15px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px; font-weight: 300;
+    color: var(--charcoal);
+    resize: none; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.5;
+    max-height: 110px; min-height: 48px;
+    overflow-y: auto;
+    -webkit-appearance: none;
+  }
+
+  textarea::placeholder { color: var(--charcoal-soft); opacity: 0.65; }
+  textarea:focus { border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(196,103,58,0.09); }
+
+  .btn-send {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--terracotta); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(196,103,58,0.28);
+    -webkit-appearance: none;
+  }
+
+  .btn-send:hover { background: var(--terracotta-light); transform: translateY(-1px); }
+  .btn-send:active { transform: translateY(0); }
+  .btn-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-send svg { width: 19px; height: 19px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* bottom row */
+  .bottom-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 10px; padding: 0 2px;
+  }
+
+  .mic-hint {
+    font-size: 11px; color: var(--charcoal-soft);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .mic-hint svg { width: 11px; height: 11px; stroke: var(--charcoal-soft); fill: none; stroke-width: 2; }
+
+  .btn-save {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border-radius: 20px;
+    border: 1.5px solid var(--border); background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 500;
+    color: var(--charcoal-soft); cursor: pointer; transition: all 0.2s;
+    -webkit-appearance: none;
+  }
+  .btn-save:hover { border-color: var(--sage); color: var(--sage); background: rgba(122,158,142,0.06); }
+  .btn-save.saved { border-color: var(--sage); color: var(--sage); background: rgba(122,158,142,0.1); }
+  .btn-save svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ── VOICE OVERLAY ── */
+  .voice-overlay {
+    position: fixed; inset: 0;
+    background: rgba(30,22,18,0.75);
+    backdrop-filter: blur(10px) saturate(0.8);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .voice-overlay.active { opacity: 1; pointer-events: all; }
+
+  /* Animated orb */
+  .voice-orb-wrap {
+    position: relative;
+    width: 140px; height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .voice-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(196,103,58,0.3);
+    animation: ringExpand 2s ease-out infinite;
+  }
+
+  .voice-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+  .voice-ring:nth-child(2) { width: 80%; height: 80%; animation-delay: 0.4s; }
+  .voice-ring:nth-child(3) { width: 60%; height: 60%; animation-delay: 0.8s; }
+
+  .voice-orb {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: var(--terracotta);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    box-shadow: 0 0 40px rgba(196,103,58,0.4);
+    transition: transform 0.1s;
+  }
+
+  .voice-orb.speaking { animation: orbBreath 0.4s ease infinite alternate; }
+
+  .voice-orb svg { width: 40px; height: 40px; stroke: white; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .voice-label {
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  .voice-sub-label {
+    color: rgba(255,255,255,0.55);
+    font-size: 12.5px; font-weight: 300;
+    margin-bottom: 28px; text-align: center;
+    max-width: 260px;
+  }
+
+  /* Live transcript box */
+  .transcript-box {
+    width: min(340px, 90vw);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 14px;
+    padding: 16px 20px;
+    color: rgba(255,255,255,0.85);
+    font-size: 14px; font-weight: 300; line-height: 1.6;
+    font-style: italic; text-align: center;
+    min-height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .transcript-box:empty::before {
+    content: 'Start speaking…';
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+  }
+
+  .voice-controls { display: flex; gap: 12px; }
+
+  .btn-voice-done {
+    padding: 13px 28px; border-radius: 40px;
+    border: 1.5px solid rgba(255,255,255,0.28);
+    background: rgba(255,255,255,0.1);
+    color: white; font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .btn-voice-done:hover { background: rgba(255,255,255,0.18); }
+
+  .btn-voice-cancel {
+    padding: 13px 20px; border-radius: 40px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-voice-cancel:hover { color: rgba(255,255,255,0.7); }
+
+  /* Volume visualiser */
+  .vol-bars {
+    display: flex; gap: 3px; align-items: flex-end;
+    height: 24px; margin: 0 auto 20px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .vol-bars.active { opacity: 1; }
+
+  .vol-bar {
+    width: 4px; border-radius: 2px;
+    background: rgba(196,103,58,0.7);
+    height: 4px; transition: height 0.08s;
+  }
+
+  /* ── SAVE MODAL ── */
+  .modal-back {
+    position: fixed; inset: 0;
+    background: rgba(44,36,32,0.5);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-back.active { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--warm-white); border-radius: 22px;
+    padding: 28px; max-width: 380px; width: 100%;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(16px); transition: transform 0.25s;
+  }
+  .modal-back.active .modal { transform: translateY(0); }
+
+  .modal-ico {
+    width: 52px; height: 52px; background: var(--terracotta-pale);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .modal-ico svg { width: 26px; height: 26px; stroke: var(--terracotta); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 500; margin-bottom: 7px; }
+  .modal p  { font-size: 13.5px; color: var(--charcoal-soft); font-weight: 300; line-height: 1.6; margin-bottom: 22px; }
+  .modal-btns { display: flex; gap: 9px; }
+
+  .btn-primary {
+    flex: 1; padding: 12px; border-radius: 11px;
+    border: none; background: var(--terracotta); color: white;
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-primary:hover { background: var(--terracotta-light); }
+  .btn-primary svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .btn-secondary {
+    padding: 12px 18px; border-radius: 11px;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--charcoal-soft); font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--charcoal-mid); color: var(--charcoal); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%,60%,100% { transform:translateY(0); }
+    30% { transform:translateY(-5px); }
+  }
+
+  @keyframes livePulse {
+    0%,100% { opacity:1; } 50% { opacity:0.4; }
+  }
+
+  @keyframes ringPulse {
+    0%   { transform:scale(1);   opacity:0.5; }
+    100% { transform:scale(1.35); opacity:0; }
+  }
+
+  @keyframes ringExpand {
+    0%   { transform:scale(0.6); opacity:0.6; }
+    100% { transform:scale(1.4); opacity:0; }
+  }
+
+  @keyframes orbBreath {
+    from { transform:scale(1); }
+    to   { transform:scale(1.06); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    header { padding: 12px 14px; }
+    .chat-area { padding: 14px 12px; gap: 10px; }
+    .input-area { padding: 10px 12px 14px; }
+    .bubble { font-size: 14px; padding: 11px 13px; }
+    .welcome h2 { font-size: 21px; }
+    .welcome-cta { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">Litmetrics</span>
+        <span class="logo-sub">Legal Intake</span>
+      </div>
+    </div>
+    <div class="status-pill" id="statuspill">
+      <div class="status-dot"></div>
+      <span id="statuslabel">Connecting…</span>
+    </div>
+  </header>
+
+  <!-- CHAT -->
+  <div class="chat-area" id="chatarea">
+    <div class="welcome" id="welcome">
+      <div class="welcome-orb">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h2>Here when you need guidance</h2>
+      <p>Tell us what's happened in your own words. Everything you share is confidential and handled with care.</p>
+      <div class="welcome-cta">
+        <button class="cta-chip voice-cta" id="startvoice">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10a7 7 0 01-14 0M12 19v3M8 22h8"/></svg>
+          Start with voice
+        </button>
+        <button class="cta-chip text-cta" id="starttext">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Type instead
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-row">
+      <button class="btn-voice-main" id="voicebtn" aria-label="Voice input">
+        <div class="rec-ring"></div>
+        <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10a7 7 0 01-14 0M12 19v3M8 22h8"/></svg>
+      </button>
+      <textarea id="msginput" placeholder="Type your message…" rows="1" aria-label="Your message"></textarea>
+      <button class="btn-send" id="sendbtn" disabled aria-label="Send">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="bottom-row">
+      <div class="mic-hint">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Tap mic to speak
+      </div>
+      <button class="btn-save" id="savebtn" aria-label="Save conversation">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save chat
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VOICE OVERLAY -->
+<div class="voice-overlay" id="voiceoverlay">
+  <div class="voice-orb-wrap">
+    <div class="voice-ring"></div>
+    <div class="voice-ring"></div>
+    <div class="voice-ring"></div>
+    <div class="voice-orb" id="voiceorb">
+      <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10a7 7 0 01-14 0M12 19v3M8 22h8"/></svg>
+    </div>
+  </div>
+  <div class="voice-label" id="voicelabel">Listening…</div>
+  <div class="voice-sub-label" id="voicesub">Speak clearly — I'm here</div>
+  <div class="vol-bars" id="volbars">
+    <div class="vol-bar"></div><div class="vol-bar"></div><div class="vol-bar"></div>
+    <div class="vol-bar"></div><div class="vol-bar"></div><div class="vol-bar"></div>
+    <div class="vol-bar"></div><div class="vol-bar"></div>
+  </div>
+  <div class="transcript-box" id="transcriptbox"></div>
+  <div class="voice-controls">
+    <button class="btn-voice-done" id="voicedonebtn">Done speaking</button>
+    <button class="btn-voice-cancel" id="voicecancelbtn">Cancel</button>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-back" id="savemodal">
+  <div class="modal">
+    <div class="modal-ico">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </div>
+    <h3>Save your conversation</h3>
+    <p>Download a full copy of this session to your device — including everything discussed today.</p>
+    <div class="modal-btns">
+      <button class="btn-primary" id="confirmsave">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+      <button class="btn-secondary" id="cancelsave">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const API = 'https://lexai-agent.onrender.com';
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let sessionId       = null;
+let currentPhase    = 'intake';
+let isLoading       = false;
+let isRecording     = false;
+let mediaRecorder   = null;
+let audioChunks     = [];
+let recognizer      = null;    // Web Speech API fallback
+let audioCtx        = null;
+let analyserNode    = null;
+let volRAF          = null;
+let conversationLog = [];
+
+// ═══════════════════════════════════════════════════════════
+// DOM REFS
+// ═══════════════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const chatArea      = $('chatarea');
+const msginput      = $('msginput');
+const sendbtn       = $('sendbtn');
+const voicebtn      = $('voicebtn');
+const voiceoverlay  = $('voiceoverlay');
+const voiceorb      = $('voiceorb');
+const voicelabel    = $('voicelabel');
+const voicesub      = $('voicesub');
+const volbars       = $('volbars');
+const transcriptbox = $('transcriptbox');
+const voicedonebtn  = $('voicedonebtn');
+const voicecancelbtn= $('voicecancelbtn');
+const statuspill    = $('statuspill');
+const statuslabel   = $('statuslabel');
+const savebtn       = $('savebtn');
+const savemodal     = $('savemodal');
+const confirmsave   = $('confirmsave');
+const cancelsave    = $('cancelsave');
+const startvoicebtn = $('startvoice');
+const starttextbtn  = $('starttext');
+
+// ═══════════════════════════════════════════════════════════
+// STATUS
+// ═══════════════════════════════════════════════════════════
+function setStatus(state, text) {
+  statuspill.className = 'status-pill ' + state;
+  statuslabel.textContent = text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════════════════════
+async function startSession() {
+  setStatus('', 'Connecting…');
+  try {
+    const res  = await fetch(`${API}/session`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ voiceMode:'chat' }) });
+    const data = await res.json();
+    sessionId    = data.sessionId;
+    currentPhase = data.currentPhase || 'intake';
+    setStatus('connected', 'Connected');
+  } catch {
+    setStatus('error', 'Connection error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MESSAGES
+// ═══════════════════════════════════════════════════════════
+function removeWelcome() {
+  const w = $('welcome');
+  if (w) { w.style.opacity='0'; w.style.transform='scale(0.97)'; w.style.transition='all 0.25s'; setTimeout(()=>w.remove(),250); }
+}
+
+function addMessage(role, text) {
+  const wrap = document.createElement('div');
+  wrap.className = `message ${role}`;
+
+  const av = document.createElement('div');
+  av.className = `av ${role === 'agent' ? 'agent' : 'user'}`;
+  av.textContent = role === 'agent' ? 'L' : 'You';
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.textContent = text;
+
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  chatArea.appendChild(wrap);
+  scrollDown();
+  conversationLog.push({ role, text, ts: new Date().toISOString() });
+}
+
+function addDisclaimer() {
+  const n = document.createElement('div');
+  n.className = 'disclaimer-note';
+  n.textContent = 'General legal information only — not legal advice or an attorney-client relationship.';
+  chatArea.appendChild(n);
+  scrollDown();
+}
+
+function showTyping() {
+  if ($('typing')) return;
+  const t = document.createElement('div');
+  t.className = 'typing'; t.id = 'typing';
+  const av = document.createElement('div');
+  av.className = 'av agent'; av.textContent = 'L';
+  const dots = document.createElement('div');
+  dots.className = 'typing-dots';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  t.appendChild(av); t.appendChild(dots);
+  chatArea.appendChild(t);
+  scrollDown();
+}
+
+function hideTyping() { const t=$('typing'); if(t) t.remove(); }
+
+function scrollDown() { chatArea.scrollTop = chatArea.scrollHeight; }
+
+// ═══════════════════════════════════════════════════════════
+// SEND MESSAGE
+// ═══════════════════════════════════════════════════════════
+async function sendMessage(text) {
+  text = text.trim();
+  if (!text || isLoading) return;
+  if (!sessionId) await startSession();
+
+  removeWelcome();
+  isLoading = true;
+  sendbtn.disabled = true;
+  msginput.disabled = true;
+  msginput.value = '';
+  autoResize();
+
+  addMessage('user', text);
+  showTyping();
+
+  try {
+    const res  = await fetch(`${API}/chat`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sessionId, message: text }) });
+    const data = await res.json();
+    hideTyping();
+
+    if (data.reply) {
+      addMessage('agent', data.reply);
+      currentPhase = data.currentPhase || currentPhase;
+
+      if (['wrapup','done'].includes(data.currentPhase)) addDisclaimer();
+
+      // TTS: read agent reply aloud
+      if (data.reply) speakReply(data.reply);
+    }
+  } catch {
+    hideTyping();
+    addMessage('agent', "I'm having a brief technical difficulty. Could you try again?");
+  }
+
+  isLoading = false;
+  msginput.disabled = false;
+  sendbtn.disabled = !msginput.value.trim();
+  msginput.focus();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TEXT-TO-SPEECH  (ElevenLabs via backend → Web Speech fallback)
+// ═══════════════════════════════════════════════════════════
+let ttsQueue = [];
+let ttsPlaying = false;
+
+async function speakReply(text) {
+  ttsQueue.push(text);
+  if (!ttsPlaying) drainTTS();
+}
+
+async function drainTTS() {
+  if (!ttsQueue.length) { ttsPlaying = false; return; }
+  ttsPlaying = true;
+  const text = ttsQueue.shift();
+
+  // Try ElevenLabs via backend
+  if (sessionId) {
+    try {
+      const res = await fetch(`${API}/voice/synthesise`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ text, sessionId }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const aud  = new Audio(url);
+        voiceorb.classList.add('speaking');
+        aud.onended = () => { URL.revokeObjectURL(url); voiceorb.classList.remove('speaking'); drainTTS(); };
+        aud.onerror = () => { voiceorb.classList.remove('speaking'); fallbackTTS(text); };
+        aud.play();
+        return;
+      }
+    } catch {}
+  }
+
+  fallbackTTS(text);
+}
+
+function fallbackTTS(text) {
+  if (!window.speechSynthesis) { drainTTS(); return; }
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-US'; utt.rate = 0.95; utt.pitch = 1;
+  // Pick a warm female voice if available
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => /samantha|karen|moira|victoria|fiona/i.test(v.name));
+  if (preferred) utt.voice = preferred;
+  utt.onend  = () => { voiceorb.classList.remove('speaking'); drainTTS(); };
+  utt.onerror= () => { voiceorb.classList.remove('speaking'); drainTTS(); };
+  voiceorb.classList.add('speaking');
+  speechSynthesis.speak(utt);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SPEECH-TO-TEXT  (MediaRecorder → Deepgram → Web Speech fallback)
+// ═══════════════════════════════════════════════════════════
+voicebtn.addEventListener('click', () => { if (isRecording) stopVoice(); else beginVoice(); });
+startvoicebtn?.addEventListener('click', () => { removeWelcome(); beginVoice(); });
+starttextbtn?.addEventListener('click', () => { removeWelcome(); msginput.focus(); });
+voicedonebtn.addEventListener('click', stopVoice);
+voicecancelbtn.addEventListener('click', cancelVoice);
+
+async function beginVoice() {
+  if (!navigator.mediaDevices?.getUserMedia) { beginWebSpeech(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    startMediaRecorder(stream);
+  } catch { beginWebSpeech(); }
+}
+
+function startMediaRecorder(stream) {
+  isRecording = true;
+  audioChunks = [];
+  voicebtn.classList.add('active');
+  showVoiceOverlay('Listening…', 'Speak clearly — I\'m here');
+  startVolVisualiser(stream);
+
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.addEventListener('dataavailable', e => audioChunks.push(e.data));
+  mediaRecorder.addEventListener('stop', () => {
+    stream.getTracks().forEach(t => t.stop());
+    stopVolVisualiser();
+    processMediaRecording();
+  });
+  mediaRecorder.start(250);
+}
+
+function stopVoice() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    voicelabel.textContent = 'Processing…';
+    voicesub.textContent   = 'Just a moment';
+    voicebtn.classList.remove('active');
+    isRecording = false;
+    mediaRecorder.stop();
+    return;
+  }
+  if (recognizer) { recognizer.stop(); return; }
+  cancelVoice();
+}
+
+function cancelVoice() {
+  isRecording = false;
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  if (recognizer) { recognizer.abort(); recognizer = null; }
+  stopVolVisualiser();
+  hideVoiceOverlay();
+  voicebtn.classList.remove('active');
+}
+
+async function processMediaRecording() {
+  const blob = new Blob(audioChunks, { type: 'audio/webm' });
+  if (!blob.size) { hideVoiceOverlay(); return; }
+
+  // Try backend Deepgram STT
+  if (sessionId) {
+    try {
+      const fd = new FormData();
+      fd.append('audio', blob, 'rec.webm');
+      fd.append('sessionId', sessionId);
+      const res = await fetch(`${API}/voice/transcribe`, { method:'POST', body: fd });
+      const data = await res.json();
+      if (data.transcript?.trim()) {
+        transcriptbox.textContent = '\u201c' + data.transcript + '\u201d';
+        await delay(700);
+        hideVoiceOverlay();
+        await sendMessage(data.transcript);
+        return;
+      }
+    } catch {}
+  }
+
+  // Fallback — Web Speech on the same audio won't work; just show hint
+  hideVoiceOverlay();
+  alert('Could not transcribe audio. Please try again or type your message.');
+}
+
+// Web Speech API fallback
+function beginWebSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Voice input isn\'t supported on this browser. Please type your message.'); return; }
+
+  isRecording = true;
+  voicebtn.classList.add('active');
+  showVoiceOverlay('Listening…', 'Speak clearly');
+
+  recognizer = new SR();
+  recognizer.lang = 'en-US';
+  recognizer.interimResults = true;
+  recognizer.continuous = false;
+
+  recognizer.onresult = e => {
+    let t = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
+    transcriptbox.textContent = t ? '\u201c' + t + '\u201d' : '';
+  };
+
+  recognizer.onend = async () => {
+    const t = transcriptbox.textContent.replace(/^\u201c|\u201d$/g,'');
+    isRecording = false;
+    voicebtn.classList.remove('active');
+    recognizer = null;
+    if (t.trim()) {
+      await delay(500);
+      hideVoiceOverlay();
+      await sendMessage(t.trim());
+    } else {
+      hideVoiceOverlay();
+    }
+  };
+
+  recognizer.onerror = () => { isRecording=false; voicebtn.classList.remove('active'); recognizer=null; hideVoiceOverlay(); };
+  recognizer.start();
+}
+
+// ═══════════════════════════════════════════════════════════
+// VOLUME VISUALISER
+// ═══════════════════════════════════════════════════════════
+function startVolVisualiser(stream) {
+  try {
+    audioCtx    = new (window.AudioContext || window.webkitAudioContext)();
+    analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 64;
+    const src = audioCtx.createMediaStreamSource(stream);
+    src.connect(analyserNode);
+    const bars = volbars.querySelectorAll('.vol-bar');
+    volbars.classList.add('active');
+    const data = new Uint8Array(analyserNode.frequencyBinCount);
+
+    function draw() {
+      volRAF = requestAnimationFrame(draw);
+      analyserNode.getByteFrequencyData(data);
+      bars.forEach((bar, i) => {
+        const val = data[i * 2] || 0;
+        bar.style.height = Math.max(4, (val / 255) * 22) + 'px';
+      });
+    }
+    draw();
+  } catch {}
+}
+
+function stopVolVisualiser() {
+  if (volRAF) { cancelAnimationFrame(volRAF); volRAF = null; }
+  volbars.classList.remove('active');
+  volbars.querySelectorAll('.vol-bar').forEach(b => b.style.height = '4px');
+  if (audioCtx) { audioCtx.close().catch(()=>{}); audioCtx = null; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// VOICE OVERLAY
+// ═══════════════════════════════════════════════════════════
+function showVoiceOverlay(label, sub) {
+  voicelabel.textContent   = label;
+  voicesub.textContent     = sub;
+  transcriptbox.textContent = '';
+  voiceoverlay.classList.add('active');
+}
+
+function hideVoiceOverlay() {
+  voiceoverlay.classList.remove('active');
+  transcriptbox.textContent = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// TEXT INPUT
+// ═══════════════════════════════════════════════════════════
+function autoResize() {
+  msginput.style.height = 'auto';
+  msginput.style.height = Math.min(msginput.scrollHeight, 110) + 'px';
+}
+
+msginput.addEventListener('input', () => { sendbtn.disabled = !msginput.value.trim(); autoResize(); });
+msginput.addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); if (!sendbtn.disabled) sendMessage(msginput.value); } });
+sendbtn.addEventListener('click', () => sendMessage(msginput.value));
+
+// ═══════════════════════════════════════════════════════════
+// SAVE CONVERSATION
+// ═══════════════════════════════════════════════════════════
+savebtn.addEventListener('click', () => savemodal.classList.add('active'));
+cancelsave.addEventListener('click', () => savemodal.classList.remove('active'));
+savemodal.addEventListener('click', e => { if (e.target === savemodal) savemodal.classList.remove('active'); });
+
+confirmsave.addEventListener('click', () => {
+  savemodal.classList.remove('active');
+  if (!conversationLog.length) { alert('Nothing to save yet.'); return; }
+
+  const d = new Date();
+  let txt  = `LITMETRICS — Legal Intake Session\n${'═'.repeat(46)}\n`;
+  txt += `Date:    ${d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;
+  txt += `Time:    ${d.toLocaleTimeString()}\n`;
+  txt += `Session: ${sessionId || 'N/A'}\n`;
+  txt += `${'═'.repeat(46)}\n\n`;
+
+  conversationLog.forEach(e => {
+    const t   = new Date(e.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const who = e.role==='agent' ? 'Litmetrics' : 'You';
+    txt += `[${t}] ${who}:\n${e.text}\n\n`;
+  });
+
+  txt += `${'─'.repeat(46)}\n`;
+  txt += `DISCLAIMER: This conversation contains general legal information only and does not constitute legal advice. It does not create an attorney-client relationship. Please consult a qualified attorney for advice specific to your situation.\n\n`;
+  txt += `© ${d.getFullYear()} Litmetrics. Confidential.\n`;
+
+  const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `litmetrics-${d.toISOString().split('T')[0]}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  savebtn.classList.add('saved');
+  savebtn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Saved`;
+  setTimeout(() => {
+    savebtn.classList.remove('saved');
+    savebtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save chat`;
+  }, 3000);
+});
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+// Pre-load voices for Web Speech TTS
+if (window.speechSynthesis) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+startSession();
+</script>
+</body>
+</html>
