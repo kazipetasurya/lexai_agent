@@ -677,6 +677,7 @@ let audioCtx        = null;
 let analyserNode    = null;
 let volRAF          = null;
 let conversationLog = [];
+let lastInputWasVoice = false;
 
 // ═══════════════════════════════════════════════════════════
 // DOM REFS
@@ -786,6 +787,7 @@ function scrollDown() { chatArea.scrollTop = chatArea.scrollHeight; }
 async function sendMessage(text) {
   text = text.trim();
   if (!text || isLoading) return;
+  if (!isRecording) lastInputWasVoice = false;
   if (!sessionId) await startSession();
 
   removeWelcome();
@@ -809,8 +811,8 @@ async function sendMessage(text) {
 
       if (['wrapup','done'].includes(data.currentPhase)) addDisclaimer();
 
-      // TTS: read agent reply aloud
-      if (data.reply) speakReply(data.reply);
+      // TTS: only read aloud when voice was used
+      if (data.reply && lastInputWasVoice) speakReply(data.reply);
     }
   } catch {
     hideTyping();
@@ -949,6 +951,7 @@ async function processMediaRecording() {
         transcriptbox.textContent = '\u201c' + data.transcript + '\u201d';
         await delay(700);
         hideVoiceOverlay();
+        lastInputWasVoice = true;
         await sendMessage(data.transcript);
         return;
       }
@@ -988,6 +991,7 @@ function beginWebSpeech() {
     if (t.trim()) {
       await delay(500);
       hideVoiceOverlay();
+      lastInputWasVoice = true;
       await sendMessage(t.trim());
     } else {
       hideVoiceOverlay();
