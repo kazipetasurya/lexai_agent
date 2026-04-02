@@ -253,6 +253,9 @@ app.post("/voice/synthesise", async (req: Request, res: Response) => {
   } catch (err) { const e = getTTSError({ sessionId }); logError("[TTS]", e.logMessage, err); if (!res.headersSent) res.status(500).json({ error: e.fallbackNote }); }
 });
 
+app.use(express.static(path.resolve(process.cwd(), ".")));
+app.get("/", (_req: Request, res: Response) => res.sendFile(path.resolve(process.cwd(), "index.html")));
+
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok", version: "1.0.0", uptime: process.uptime(), voiceEnabled: !!(DEEPGRAM_API_KEY && ELEVENLABS_API_KEY), timestamp: new Date().toISOString() });
 });
