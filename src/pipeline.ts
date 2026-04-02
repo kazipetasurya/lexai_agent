@@ -4,7 +4,7 @@
 
 import express, { type Request, type Response, type NextFunction } from "express";
 import multer from "multer";
-import { createClient } from "@libsql/client/http";
+import { createClient } from "@libsql/client";
 import OpenAI from "openai";
 import * as fs from "fs";
 import * as path from "path";
