@@ -40,7 +40,6 @@ for (const dir of [UPLOADS_DIR, DATA_DIR]) {
 const turso = createClient({
   url: process.env.TURSO_DATABASE_URL ?? `file:${DB_PATH}`,
   authToken: process.env.TURSO_AUTH_TOKEN,
-  syncInterval: 0,
 });
 
 async function initDb(): Promise<void> {
