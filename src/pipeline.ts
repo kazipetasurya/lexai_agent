@@ -12,6 +12,7 @@ import * as crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
 import FormData from "form-data";
 import fetch from "node-fetch";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 import { initialState, type LegalAgentState, type VoiceMode } from "../state/schema";
 import { orchestrate } from "./orchestrator";
@@ -74,6 +75,14 @@ async function dbListSessions() {
 // ── OpenAI + Multer ────────────────────────────────────────────────────────
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+const r2 = process.env.R2_ACCOUNT_ID ? new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+  },
+}) : null;
 const storage = multer.diskStorage({ destination: (_r, _f, cb) => cb(null, UPLOADS_DIR), filename: (_r, _f, cb) => cb(null, `${uuidv4()}-${Date.now()}`) });
 const upload = multer({ storage, limits: { fileSize: 52 * 1024 * 1024 }, fileFilter: (_r, _f, cb) => cb(null, true) });
 
@@ -163,12 +172,27 @@ app.post("/upload/:sessionId", upload.single("file"), async (req: Request, res: 
   if (ve) { logWarn("[Upload]", ve.logMessage); fs.unlink(tempPath, () => {}); return res.status(ve.httpStatus).json({ error: ve.userMessage }); }
   const storedName = `${filename}${path.extname(originalname).toLowerCase()}`;
   const finalPath = path.join(UPLOADS_DIR, storedName);
-  try { fs.renameSync(tempPath, finalPath); }
-  catch (err) { logError("[Upload]", `Failed to move ${originalname}`, err); const e = getFileUploadError("disk", { fileName: originalname }); return res.status(e.httpStatus).json({ error: e.userMessage }); }
+  let fileBuffer: Buffer;
+  try { fileBuffer = fs.readFileSync(tempPath); }
+  catch (err) { logError("[Upload]", `Failed to read ${originalname}`, err); const e = getFileUploadError("disk", { fileName: originalname }); return res.status(e.httpStatus).json({ error: e.userMessage }); }
+
+  try {
+    if (r2 && process.env.R2_BUCKET_NAME) {
+      await r2.send(new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: storedName,
+        Body: fileBuffer,
+        ContentType: mimetype,
+      }));
+      fs.unlink(tempPath, () => {});
+    } else {
+      fs.renameSync(tempPath, finalPath);
+    }
+  } catch (err) { logError("[Upload]", `Failed to store ${originalname}`, err); const e = getFileUploadError("disk", { fileName: originalname }); return res.status(e.httpStatus).json({ error: e.userMessage }); }
   let description = getFileAnalysisFallbackDescription(originalname);
   try {
     if (!mimetype.startsWith("video/")) {
-      const base64 = fs.readFileSync(finalPath).toString("base64");
+      const base64 = fileBuffer.toString("base64");
       const vr = await openai.chat.completions.create({ model: "gpt-4o-mini", max_tokens: 256, messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: `data:${mimetype};base64,${base64}`, detail: "low" } }, { type: "text", text: "Describe this image in 1-2 sentences for a legal case file. Be factual and neutral." }] }] });
       const raw = vr.choices[0]?.message?.content?.trim() ?? "";
       if (raw) description = raw;
