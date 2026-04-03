@@ -28,6 +28,7 @@ const OPENAI_API_KEY     = process.env.OPENAI_API_KEY ?? "";
 const DEEPGRAM_API_KEY   = process.env.DEEPGRAM_API_KEY ?? "";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY ?? "";
 const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? "21m00Tcm4TlvDq8ikWAM";
+const TAVILY_API_KEY     = process.env.TAVILY_API_KEY ?? "";
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
 const DATA_DIR    = path.resolve(process.cwd(), "data");
 const DB_PATH     = path.join(DATA_DIR, "lexai.db");
@@ -86,6 +87,33 @@ const r2 = process.env.R2_ACCOUNT_ID ? new S3Client({
   },
 }) : null;
 const storage = multer.diskStorage({ destination: (_r, _f, cb) => cb(null, UPLOADS_DIR), filename: (_r, _f, cb) => cb(null, `${uuidv4()}-${Date.now()}`) });
+
+// ── Tavily web search ─────────────────────────────────────────────────────
+async function tavilySearch(query: string): Promise<string> {
+  if (!TAVILY_API_KEY) return "";
+  try {
+    const res = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ api_key: TAVILY_API_KEY, query, max_results: 3, include_answer: true }),
+    });
+    const data = await res.json() as { answer?: string; results?: Array<{title:string;url:string;content:string}> };
+    const parts: string[] = [];
+    if (data.answer) parts.push(data.answer);
+    if (data.results) data.results.forEach(r => parts.push(`${r.title}\n${r.url}\n${r.content}`));
+    return parts.join("\n\n");
+  } catch (err) { logWarn("[Search]", `Tavily failed: ${(err as Error).message}`); return ""; }
+}
+
+const WEB_SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool[] = [{
+  type: "function",
+  function: {
+    name: "web_search",
+    description: "Search the web for current legal information, lawyer directories, court contacts, police departments, victim assistance programs, filing fees, or any real-world information the client needs.",
+    parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] },
+  },
+}];
+
 const upload = multer({ storage, limits: { fileSize: 52 * 1024 * 1024 }, fileFilter: (_r, _f, cb) => cb(null, true) });
 
 // ── runTurn ────────────────────────────────────────────────────────────────
@@ -114,8 +142,22 @@ export const runTurn = traceable(async function runTurn(state: LegalAgentState):
   let speakerFailed = false;
   try {
     const sc = getSpeakerLLMConfig(state.voiceMode);
-    const sr = await openai.chat.completions.create({ ...sc, messages: [{ role: "user", content: buildSpeakerPrompt(ws) }] });
-    reply = sr.choices[0]?.message?.content?.trim() ?? "";
+    const useSearch = !!TAVILY_API_KEY && ["guidance", "situation"].includes(ws.currentPhase);
+    const tools = useSearch ? WEB_SEARCH_TOOL : undefined;
+    type Msg = OpenAI.Chat.ChatCompletionMessageParam;
+    const messages: Msg[] = [{ role: "user", content: buildSpeakerPrompt(ws) }];
+    const sr = await openai.chat.completions.create({ ...sc, messages, ...(tools ? { tools, tool_choice: "auto" } : {}) });
+    const choice = sr.choices[0];
+    if (choice?.finish_reason === "tool_calls" && choice.message.tool_calls?.[0]) {
+      const toolCall = choice.message.tool_calls[0];
+      const args = JSON.parse(toolCall.function.arguments) as { query: string };
+      logInfo("[Search]", `Searching: "${args.query}"`);
+      const searchResults = await tavilySearch(args.query);
+      const followUp = await openai.chat.completions.create({ ...sc, messages: [...messages, choice.message, { role: "tool", tool_call_id: toolCall.id, content: searchResults || "No results — answer from general knowledge." }] });
+      reply = followUp.choices[0]?.message?.content?.trim() ?? "";
+    } else {
+      reply = choice?.message?.content?.trim() ?? "";
+    }
     if (!reply) throw new Error("Empty speaker response");
   } catch (err) { logError("[Speaker]", `Failed turn ${state.turnCount}`, err); reply = getSpeakerFallbackReply(phase); speakerFailed = true; }
 
@@ -270,7 +312,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 initDb().then(() => {
   app.listen(PORT, () => {
     logInfo("[Startup]", `LexAI running on http://localhost:${PORT}`);
-    logInfo("[Startup]", `STT: ${DEEPGRAM_API_KEY ? "enabled" : "disabled"} | TTS: ${ELEVENLABS_API_KEY ? "enabled" : "disabled"}`);
+    logInfo("[Startup]", `STT: ${DEEPGRAM_API_KEY ? "enabled" : "disabled"} | TTS: ${ELEVENLABS_API_KEY ? "enabled" : "disabled"} | Search: ${TAVILY_API_KEY ? "enabled" : "disabled"}`);
     logInfo("[Startup]", `DB: ${process.env.TURSO_DATABASE_URL ?? DB_PATH}`);
   });
 }).catch((err) => { console.error("DB init failed:", err); process.exit(1); });
