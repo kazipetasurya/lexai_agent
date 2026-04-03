@@ -97,7 +97,7 @@ export function buildSpeakerPrompt(state: LegalAgentState): string {
   // -------------------------------------------------------------------------
   // Disclaimer instruction — wrapup phase only
   // -------------------------------------------------------------------------
-  if (phase === "wrapup" && !state.disclaimerInjected) {
+  if (phase === "wrapup" && !state.disclaimerInjected && state.phaseTurnCount === 0) {
     lines.push("IMPORTANT — DISCLAIMER REQUIRED:");
     lines.push(
       'You MUST include the following disclaimer naturally in your response, then ask the client to acknowledge it: ' +
