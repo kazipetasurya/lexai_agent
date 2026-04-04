@@ -78,6 +78,7 @@ async function dbListSessions() {
 // ── OpenAI + Multer ────────────────────────────────────────────────────────
 
 const openai = wrapOpenAI(new OpenAI({ apiKey: OPENAI_API_KEY }));
+const openaiRaw = new OpenAI({ apiKey: OPENAI_API_KEY });
 const r2 = process.env.R2_ACCOUNT_ID ? new S3Client({
   region: "auto",
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -155,7 +156,7 @@ export const runTurn = traceable(async function runTurn(state: LegalAgentState):
       const searchResults = await tavilySearch(args.query);
       const assistantMsg: Msg = { role: "assistant", content: null, tool_calls: choice.message.tool_calls };
       const toolMsg: Msg = { role: "tool", tool_call_id: toolCall.id, content: searchResults || "No results — answer from general knowledge." };
-      const followUp = await openai.chat.completions.create({ ...sc, messages: [...messages, assistantMsg, toolMsg] });
+      const followUp = await openaiRaw.chat.completions.create({ ...sc, messages: [...messages, assistantMsg, toolMsg] });
       reply = followUp.choices[0]?.message?.content?.trim() ?? "";
     } else {
       reply = choice?.message?.content?.trim() ?? "";
