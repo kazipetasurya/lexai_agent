@@ -153,7 +153,9 @@ export const runTurn = traceable(async function runTurn(state: LegalAgentState):
       const args = JSON.parse(toolCall.function.arguments) as { query: string };
       logInfo("[Search]", `Searching: "${args.query}"`);
       const searchResults = await tavilySearch(args.query);
-      const followUp = await openai.chat.completions.create({ ...sc, messages: [...messages, choice.message, { role: "tool", tool_call_id: toolCall.id, content: searchResults || "No results — answer from general knowledge." }] });
+      const assistantMsg: Msg = { role: "assistant", content: null, tool_calls: choice.message.tool_calls };
+      const toolMsg: Msg = { role: "tool", tool_call_id: toolCall.id, content: searchResults || "No results — answer from general knowledge." };
+      const followUp = await openai.chat.completions.create({ ...sc, messages: [...messages, assistantMsg, toolMsg] });
       reply = followUp.choices[0]?.message?.content?.trim() ?? "";
     } else {
       reply = choice?.message?.content?.trim() ?? "";
