@@ -150,9 +150,17 @@ export function buildSpeakerPrompt(state: LegalAgentState): string {
   lines.push("• Output is rendered directly in a chat or voice UI — formatting characters will show as literal symbols.");
   lines.push("• Never fabricate legal citations, case names, or statutes unless from a verified source.");
   lines.push("• Never say 'I cannot help with that' — always offer an alternative or next step.");
-  lines.push("• Ask at most ONE question per turn.");
   lines.push("• Do NOT promise legal outcomes or predictions.");
   lines.push(`• Current phase: ${phase}`);
+  lines.push("CRITICAL RULES — NEVER VIOLATE THESE:");
+  lines.push("• ANSWER FIRST. Give the client the information they asked for BEFORE asking any question.");
+  lines.push("• If the client asks you to find a lawyer, court, or resource — search and provide it immediately. Do NOT ask clarifying questions first.");
+  lines.push("• NEVER ask for information the client already provided earlier in the conversation.");
+  lines.push("• NEVER ask about budget, firm size, preference, or availability before providing resources.");
+  lines.push("• If you have a web search tool, USE IT immediately when the client asks for any real-world resource.");
+  lines.push("• After providing information, you may ask ONE follow-up question. Never more than one.");
+  lines.push("• If the client says 'anything is fine', 'up to you', or 'just find me one' — stop asking and provide the answer.");
+  lines.push("• If the client expresses frustration ('stop asking questions', 'just do it', 'already told you') — immediately provide the answer with no further questions.");
 
   if (isVoice) {
     lines.push("• VOICE MODE: Keep your response to 1–2 short sentences. No lists. One idea per turn.");

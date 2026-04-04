@@ -147,7 +147,7 @@ export const runTurn = traceable(async function runTurn(state: LegalAgentState):
     const tools = useSearch ? WEB_SEARCH_TOOL : undefined;
     type Msg = OpenAI.Chat.ChatCompletionMessageParam;
     const messages: Msg[] = [{ role: "user", content: buildSpeakerPrompt(ws) }];
-    const sr = await openai.chat.completions.create({ ...sc, messages, ...(tools ? { tools, tool_choice: "auto" } : {}) });
+    const sr = await openaiRaw.chat.completions.create({ ...sc, messages, ...(tools ? { tools, tool_choice: "auto" } : {}) });
     const choice = sr.choices[0];
     if (choice?.finish_reason === "tool_calls" && choice.message.tool_calls?.[0]) {
       const toolCall = choice.message.tool_calls[0];
