@@ -385,9 +385,7 @@
 </div>
 
 <script>
-const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? `${window.location.protocol}//${window.location.host}`
-  : 'https://lexai-agent.onrender.com';
+const API = `${window.location.protocol}//${window.location.host}`;
 const $ = id => document.getElementById(id);
 
 let allSessions = [];
