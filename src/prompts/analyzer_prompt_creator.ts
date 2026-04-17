@@ -21,7 +21,7 @@ import type { Phase } from "../../state/schema";
 // ---------------------------------------------------------------------------
 // Analyzer window size (last N messages shown to extraction LLM)
 // ---------------------------------------------------------------------------
-const ANALYZER_HISTORY_WINDOW = 6;
+const ANALYZER_HISTORY_WINDOW = 20;
 
 // ---------------------------------------------------------------------------
 // buildAnalyzerPrompt

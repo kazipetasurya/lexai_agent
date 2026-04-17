@@ -22,7 +22,7 @@ import type { Phase } from "../../state/schema";
 // ---------------------------------------------------------------------------
 // Speaker window sizes
 // ---------------------------------------------------------------------------
-const SPEAKER_HISTORY_WINDOW = 8;
+const SPEAKER_HISTORY_WINDOW = 14;
 
 // ---------------------------------------------------------------------------
 // buildSpeakerPrompt
@@ -86,6 +86,16 @@ export function buildSpeakerPrompt(state: LegalAgentState): string {
   // -------------------------------------------------------------------------
   lines.push("CONVERSATION:");
   lines.push(historyBlock || "(no messages yet — this is the opening turn)");
+  lines.push("");
+
+  // -------------------------------------------------------------------------
+  // Critical instruction: do not re-ask collected facts
+  // -------------------------------------------------------------------------
+  lines.push("CRITICAL INSTRUCTION FOR THIS TURN:");
+  lines.push("1. Review the COLLECTED SO FAR section above");
+  lines.push("2. DO NOT ask about anything already listed there");
+  lines.push("3. Only ask about what is GENUINELY MISSING from that list");
+  lines.push("4. If all required fields for this phase are filled, transition to the next phase");
   lines.push("");
 
   // -------------------------------------------------------------------------
@@ -161,6 +171,20 @@ export function buildSpeakerPrompt(state: LegalAgentState): string {
   lines.push("• After providing information, you may ask ONE follow-up question. Never more than one.");
   lines.push("• If the client says 'anything is fine', 'up to you', or 'just find me one' — stop asking and provide the answer.");
   lines.push("• If the client expresses frustration ('stop asking questions', 'just do it', 'already told you') — immediately provide the answer with no further questions.");
+
+  // -------------------------------------------------------------------------
+  // Hard phase-boundary guard — prevents the agent drifting out of its lane
+  // -------------------------------------------------------------------------
+  if (phase === "intake" || phase === "situation" || phase === "insurance" || phase === "witnesses") {
+    lines.push("");
+    lines.push("PHASE BOUNDARY — THIS IS NON-NEGOTIABLE:");
+    lines.push(`• You are in the ${phase.toUpperCase()} phase. Your job is data collection only.`);
+    lines.push("• Do NOT provide legal advice, find lawyers, recommend firms, or discuss case strategy.");
+    lines.push("• If the client asks to find a lawyer: say 'I'll connect you right after this quick intake — it gives any attorney you speak with everything they need.' Then ask the next intake question.");
+    lines.push("• Do NOT ask preference questions (firm size, specialization, solo vs firm, budget). Those are not your job this phase.");
+    lines.push("• Do NOT ask follow-up questions beyond the one field you need most right now.");
+    lines.push(`• Turn count this phase: ${state.phaseTurnCount}. Move fast. Every unnecessary question wastes the client's time.`);
+  }
 
   if (isVoice) {
     lines.push("• VOICE MODE: Keep your response to 1–2 short sentences. No lists. One idea per turn.");

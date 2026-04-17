@@ -39,7 +39,7 @@
 
   .app {
     display: flex; flex-direction: column;
-    height: 100dvh; max-width: 720px; margin: 0 auto;
+    height: 100dvh; width: 100%;
   }
 
   /* ── HEADER ── */
@@ -70,10 +70,20 @@
   .status-pill.connected .status-dot { background: var(--sage); animation: livePulse 2s infinite; }
   .status-pill.error .status-dot     { background: var(--terracotta); }
 
+  /* ── PHASE BAR ── */
+  .phase-bar { padding: 8px max(20px, calc(50% - 380px)) 6px; background: var(--warm-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .phase-steps { display: flex; gap: 4px; margin-bottom: 5px; }
+  .phase-step { flex: 1; height: 3px; background: var(--cream-dark); border-radius: 2px; transition: background 0.4s ease; }
+  .phase-step.active { background: var(--terracotta); }
+  .phase-step.done   { background: var(--sage); }
+  .phase-label-row { display: flex; justify-content: space-between; }
+  .phase-label { font-size: 10px; color: var(--charcoal-soft); font-weight: 300; letter-spacing: 0.3px; }
+  .phase-label.current { color: var(--terracotta); font-weight: 500; }
+
   /* ── CHAT ── */
   .chat-area {
     flex: 1; overflow-y: auto;
-    padding: 18px 16px; display: flex; flex-direction: column; gap: 12px;
+    padding: 18px max(16px, calc(50% - 380px)); display: flex; flex-direction: column; gap: 12px;
     scroll-behavior: smooth; overscroll-behavior: contain;
   }
   .chat-area::-webkit-scrollbar { width: 3px; }
@@ -175,7 +185,7 @@
   .disclaimer-note { margin: 2px 0 0 39px; font-size: 10.5px; color: var(--charcoal-soft); font-style: italic; line-height: 1.5; opacity: 0.65; }
 
   /* ── INPUT AREA ── */
-  .input-area { padding: 12px 16px 16px; background: var(--warm-white); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .input-area { padding: 12px max(16px, calc(50% - 380px)) 16px; background: var(--warm-white); border-top: 1px solid var(--border); flex-shrink: 0; }
 
   .input-row { display: flex; gap: 8px; align-items: flex-end; }
 
@@ -331,6 +341,92 @@
     .welcome h2 { font-size: 21px; }
     .welcome-cta { flex-direction: column; }
   }
+
+  /* ── QUICK INTAKE FORM ── */
+  .quick-intake-card {
+    margin-top: 20px; width: 100%; max-width: 420px;
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 18px; padding: 20px 22px;
+    box-shadow: var(--shadow); text-align: left;
+    animation: fadeUp 0.3s ease both;
+  }
+  .qic-title {
+    font-size: 12px; font-weight: 500; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--terracotta);
+    margin-bottom: 14px;
+  }
+  .qic-field { margin-bottom: 10px; }
+  .qic-select, .qic-input, .qic-textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    background: var(--cream); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 300; color: var(--charcoal);
+    outline: none; transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .qic-select:focus, .qic-input:focus, .qic-textarea:focus {
+    border-color: var(--terracotta);
+  }
+  .qic-textarea { resize: none; line-height: 1.5; }
+  .qic-urgency-row {
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .qic-urgency-label {
+    font-size: 11px; color: var(--charcoal-soft); font-weight: 400; margin-right: 2px;
+  }
+  .qic-urgency-btn {
+    padding: 5px 12px; border-radius: 16px;
+    border: 1.5px solid var(--border); background: var(--cream);
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+    color: var(--charcoal-soft); cursor: pointer; transition: all 0.18s;
+    -webkit-appearance: none;
+  }
+  .qic-urgency-btn.active {
+    border-color: var(--terracotta); background: var(--terracotta-pale);
+    color: var(--terracotta); font-weight: 500;
+  }
+  .qic-urgency-btn.emergency.active {
+    border-color: #c0392b; background: #fdf0ef; color: #c0392b;
+  }
+  .qic-submit {
+    width: 100%; padding: 11px; border-radius: 12px;
+    background: var(--terracotta); color: white; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; margin-top: 4px;
+    box-shadow: 0 3px 12px rgba(196,103,58,0.28);
+    -webkit-appearance: none;
+  }
+  .qic-submit:hover { background: var(--terracotta-light); transform: translateY(-1px); }
+  .qic-or { text-align: center; font-size: 11px; color: var(--charcoal-soft); margin: 10px 0 2px; letter-spacing: 0.8px; }
+
+  /* ── QUICK REPLY BUTTONS ── */
+  .quick-replies {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .quick-reply-btn {
+    padding: 6px 14px;
+    background: var(--terracotta-pale);
+    color: var(--terracotta);
+    border: 1px solid rgba(196,103,58,0.3);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+  }
+  .quick-reply-btn:hover {
+    background: var(--terracotta);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(196,103,58,0.25);
+  }
+  .quick-reply-btn:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
@@ -351,12 +447,66 @@
     </div>
   </header>
 
+  <!-- PHASE PROGRESS BAR -->
+  <div class="phase-bar" id="phasebar" style="display:none">
+    <div class="phase-steps" id="phasesteps"></div>
+    <div class="phase-label-row" id="phaselabelrow"></div>
+  </div>
+
   <!-- CHAT -->
   <div class="chat-area" id="chatarea">
     <div class="welcome" id="welcome">
       <div class="welcome-orb"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
       <h2>Here when you need guidance</h2>
       <p>Tell us what's happened in your own words. Everything you share is confidential and handled with care.</p>
+      <!-- Quick Intake Form -->
+      <div class="quick-intake-card" id="quickIntakeCard">
+        <div class="qic-title">Quick intake — 30 seconds</div>
+
+        <div class="qic-field">
+          <select class="qic-select" id="qicCaseType">
+            <option value="">What type of legal issue?</option>
+            <optgroup label="Civil">
+              <option value="a personal injury case">Personal Injury</option>
+              <option value="an employment dispute">Employment Dispute</option>
+              <option value="a landlord-tenant issue">Landlord / Tenant</option>
+              <option value="a contract dispute">Contract Dispute</option>
+              <option value="a family law matter">Family Law</option>
+              <option value="a medical malpractice case">Medical Malpractice</option>
+              <option value="a civil rights issue">Civil Rights</option>
+              <option value="a civil matter">Other Civil</option>
+            </optgroup>
+            <optgroup label="Criminal">
+              <option value="a criminal assault charge">Criminal — Assault</option>
+              <option value="a DUI charge">Criminal — DUI</option>
+              <option value="a drug charge">Criminal — Drug</option>
+              <option value="a theft charge">Criminal — Theft</option>
+              <option value="a domestic violence case">Criminal — Domestic Violence</option>
+              <option value="a criminal matter">Criminal — Other</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="qic-field">
+          <input class="qic-input" id="qicState" type="text" placeholder="State or jurisdiction (e.g. Indiana)" autocomplete="off">
+        </div>
+
+        <div class="qic-urgency-row">
+          <span class="qic-urgency-label">Urgency:</span>
+          <button type="button" class="qic-urgency-btn active" data-urgency="not urgent">Not urgent</button>
+          <button type="button" class="qic-urgency-btn" data-urgency="urgent — deadline or court date coming up">Has deadline</button>
+          <button type="button" class="qic-urgency-btn emergency" data-urgency="an emergency">Emergency</button>
+        </div>
+
+        <div class="qic-field">
+          <textarea class="qic-textarea" id="qicDesc" rows="2" placeholder="Briefly — what happened? (optional)"></textarea>
+        </div>
+
+        <button class="qic-submit" id="qicSubmit">Start intake →</button>
+
+        <div class="qic-or">or</div>
+      </div>
+
       <div class="welcome-cta">
         <button class="cta-chip voice-cta" id="startvoice">
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10a7 7 0 01-14 0M12 19v3M8 22h8"/></svg>
@@ -470,7 +620,9 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const API = 'https://lexai-agent.onrender.com';
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `${window.location.protocol}//${window.location.host}`
+  : 'https://lexai-agent.onrender.com';
 const REQUEST_TIMEOUT_MS = 60000; // 60s — accounts for Render cold start
 
 // ═══════════════════════════════════════════════════════════
@@ -526,6 +678,42 @@ const uploadlabel    = $('uploadlabel');
 const progressfill   = $('progressfill');
 
 // ═══════════════════════════════════════════════════════════
+// PHASE BAR
+// ═══════════════════════════════════════════════════════════
+const PHASES = [
+  { key: 'intake',    label: 'Intake' },
+  { key: 'situation', label: 'Situation' },
+  { key: 'insurance', label: 'Insurance' },
+  { key: 'witnesses', label: 'Witnesses' },
+  { key: 'guidance',  label: 'Guidance' },
+  { key: 'wrapup',    label: 'Wrap-up' },
+];
+
+function initPhaseBar() {
+  const steps  = $('phasesteps');
+  const labels = $('phaselabelrow');
+  PHASES.forEach(p => {
+    const s = document.createElement('div');
+    s.className = 'phase-step'; s.id = 'step-' + p.key;
+    steps.appendChild(s);
+    const l = document.createElement('div');
+    l.className = 'phase-label'; l.id = 'label-' + p.key;
+    l.textContent = p.label;
+    labels.appendChild(l);
+  });
+}
+
+function updatePhaseBar(phase) {
+  if (!phase || phase === 'done') { $('phasebar').style.display = 'none'; return; }
+  $('phasebar').style.display = 'block';
+  const idx = PHASES.findIndex(p => p.key === phase);
+  PHASES.forEach((p, i) => {
+    $('step-' + p.key).className  = 'phase-step' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    $('label-' + p.key).className = 'phase-label' + (i === idx ? ' current' : '');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
 // STATUS
 // ═══════════════════════════════════════════════════════════
 function setStatus(cls, text) {
@@ -559,6 +747,7 @@ async function startSession() {
     const data = await res.json();
     sessionId    = data.sessionId;
     currentPhase = data.currentPhase || 'intake';
+    updatePhaseBar(currentPhase);
     setStatus('connected', 'Connected');
   } catch {
     setStatus('error', 'Connection error — retrying…');
@@ -682,8 +871,38 @@ function addMessage(role, text) {
   bub.textContent = text;
   wrap.appendChild(av); wrap.appendChild(bub);
   chatArea.appendChild(wrap);
+  if (role === 'agent') showQuickRepliesIfYesNo(text, bub);
   scrollDown();
   conversationLog.push({ role, text, ts: new Date().toISOString() });
+}
+
+function showQuickRepliesIfYesNo(text, parentEl) {
+  const lower = text.toLowerCase();
+  const hasQuestion = lower.includes('?');
+  const hasYesNoKeyword =
+    lower.includes('do you') || lower.includes('did you') ||
+    lower.includes('have you') || lower.includes('are you') ||
+    lower.includes('can you') || lower.includes('would you') ||
+    lower.includes('filed') || lower.includes('got a') ||
+    lower.includes('insurance') || lower.includes('attorney') ||
+    lower.includes('afford') || lower.includes('police report') ||
+    lower.includes('any witnesses') || lower.includes('any evidence');
+  if (!hasQuestion || !hasYesNoKeyword) return;
+
+  const repliesDiv = document.createElement('div');
+  repliesDiv.className = 'quick-replies';
+  [{ label: 'Yes', value: 'Yes' }, { label: 'No', value: 'No' }, { label: 'Not sure', value: "I'm not sure" }].forEach(({ label, value }) => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-reply-btn';
+    btn.textContent = label;
+    btn.onclick = (e) => {
+      e.preventDefault();
+      repliesDiv.remove();
+      sendMessage(value);
+    };
+    repliesDiv.appendChild(btn);
+  });
+  parentEl.appendChild(repliesDiv);
 }
 
 function addFileBubble(fileName, fileSize, fileType) {
@@ -793,6 +1012,7 @@ async function sendMessage(text) {
       if (data.reply) {
         addMessage('agent', data.reply);
         currentPhase = data.currentPhase || currentPhase;
+        updatePhaseBar(currentPhase);
         if (['wrapup','done'].includes(data.currentPhase)) addDisclaimer();
         if (lastInputWasVoice) speakReply(data.reply);
       }
@@ -994,8 +1214,58 @@ const delay = ms => new Promise(r => setTimeout(r, ms));
 if (window.speechSynthesis) { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
 
 // ═══════════════════════════════════════════════════════════
+// QUICK INTAKE FORM
+// ═══════════════════════════════════════════════════════════
+(function initQuickIntakeForm() {
+  const card        = document.getElementById('quickIntakeCard');
+  const caseType    = document.getElementById('qicCaseType');
+  const stateInput  = document.getElementById('qicState');
+  const desc        = document.getElementById('qicDesc');
+  const submitBtn   = document.getElementById('qicSubmit');
+  const urgencyBtns = card.querySelectorAll('.qic-urgency-btn');
+
+  let selectedUrgency = 'not urgent';
+
+  urgencyBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      urgencyBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedUrgency = btn.dataset.urgency;
+    });
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    const type  = caseType.value;
+    const state = stateInput.value.trim();
+    const story = desc.value.trim();
+
+    if (!type && !state && !story) {
+      caseType.focus();
+      caseType.style.borderColor = 'var(--terracotta)';
+      setTimeout(() => caseType.style.borderColor = '', 1500);
+      return;
+    }
+
+    const parts = [];
+    if (type)  parts.push(`I have ${type}`);
+    if (state) parts.push(`in ${state}`);
+    if (selectedUrgency !== 'not urgent') parts.push(`it is ${selectedUrgency}`);
+    if (story) parts.push(story);
+
+    const message = parts.join('. ').replace(/\.\./g, '.') + '.';
+
+    card.style.opacity = '0';
+    card.style.transition = 'opacity 0.2s';
+    setTimeout(() => { card.style.display = 'none'; }, 200);
+
+    await sendMessage(message);
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════
+initPhaseBar();
 startSession();
 </script>
 </body>

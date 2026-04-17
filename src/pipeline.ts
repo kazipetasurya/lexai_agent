@@ -2,6 +2,7 @@
 // src/pipeline.ts — LexAI Legal Intake Agent (Turso edition)
 // =============================================================================
 
+import 'dotenv/config';
 import express, { type Request, type Response, type NextFunction } from "express";
 import multer from "multer";
 import { createClient } from "@libsql/client";
@@ -70,7 +71,7 @@ async function dbListSessions() {
   return result.rows.flatMap((row) => {
     try {
       const s = JSON.parse(row.state_json as string) as LegalAgentState;
-      return [{ sessionId: s.sessionId, currentPhase: s.currentPhase, turnCount: s.turnCount, legalIssueType: s.legalIssueType, jurisdiction: s.jurisdiction, urgencyLevel: s.urgencyLevel, riskFlags: s.riskFlags, liabilityScore: s.liabilityScore, caseStrengthScore: s.caseStrengthScore, createdAt: s.createdAt, updatedAt: s.updatedAt }];
+      return [{ sessionId: s.sessionId, currentPhase: s.currentPhase, turnCount: s.turnCount, legalIssueType: s.legalIssueType, legalDomain: s.legalDomain, jurisdiction: s.jurisdiction, urgencyLevel: s.urgencyLevel, riskFlags: s.riskFlags, liabilityScore: s.liabilityScore, caseStrengthScore: s.caseStrengthScore, settlementLikelihoodScore: s.settlementLikelihoodScore, statuteOfLimitationsFlag: s.statuteOfLimitationsFlag, incidentSummary: s.incidentSummary, incidentLocation: s.incidentLocation, policeReportFiled: s.policeReportFiled, createdAt: s.createdAt, updatedAt: s.updatedAt }];
     } catch { return []; }
   });
 }
@@ -143,7 +144,7 @@ export const runTurn = traceable(async function runTurn(state: LegalAgentState):
   let speakerFailed = false;
   try {
     const sc = getSpeakerLLMConfig(state.voiceMode);
-    const useSearch = !!TAVILY_API_KEY && ["guidance", "situation"].includes(ws.currentPhase);
+    const useSearch = !!TAVILY_API_KEY && ["guidance", "situation", "wrapup"].includes(ws.currentPhase);
     const tools = useSearch ? WEB_SEARCH_TOOL : undefined;
     type Msg = OpenAI.Chat.ChatCompletionMessageParam;
     const messages: Msg[] = [{ role: "user", content: buildSpeakerPrompt(ws) }];
@@ -259,9 +260,39 @@ app.get("/session/:sessionId", async (req: Request, res: Response) => {
 });
 
 app.get("/sessions", async (_req: Request, res: Response) => {
-  try { res.json(await dbListSessions()); }
+  try {
+    const sessions = await dbListSessions();
+    const enriched = sessions.map((s) => ({
+      ...s,
+      riskLevel: computeRiskLevel(s.urgencyLevel, s.riskFlags),
+      keyFacts: extractKeyFacts(s),
+      status: s.currentPhase === "done" ? "Completed" : `In Progress (${s.currentPhase})`,
+    }));
+    res.json(enriched);
+  }
   catch (err) { logError("[Sessions]", "Failed to list sessions", err); res.status(500).json({ error: PIPELINE_ERROR.userMessage }); }
 });
+
+function computeRiskLevel(urgencyLevel: string | null, riskFlags: string[]): string {
+  if (urgencyLevel === "emergency") return "Critical";
+  const hasUrgent = riskFlags.some(f => f.toLowerCase().startsWith("urgent") || f.toLowerCase().includes("high-severity"));
+  if (hasUrgent || urgencyLevel === "urgent") return "High";
+  if (riskFlags.length >= 3) return "Medium";
+  if (riskFlags.length > 0) return "Low";
+  return "Low";
+}
+
+function extractKeyFacts(s: { incidentSummary?: string | null; incidentLocation?: string | null; policeReportFiled?: boolean | null }): string[] {
+  const facts: string[] = [];
+  if (s.incidentSummary) {
+    const summary = s.incidentSummary as string;
+    facts.push(summary.length > 50 ? summary.substring(0, 50) + "…" : summary);
+  }
+  if (s.incidentLocation) facts.push(`Location: ${s.incidentLocation}`);
+  if (s.policeReportFiled === true) facts.push("Police report filed");
+  else if (s.policeReportFiled === false) facts.push("No police report");
+  return facts.slice(0, 3);
+}
 
 app.delete("/session/:sessionId", async (req: Request, res: Response) => {
   const { sessionId } = req.params;
